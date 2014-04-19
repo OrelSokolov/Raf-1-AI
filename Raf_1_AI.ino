@@ -12,6 +12,11 @@ Ultrasonic ultrasonic(12, 13);
 
 
 void unStepMotor(int pin_1, int pin_2,int pin_3,int pin_4,int speedMotor){
+  int states1[] = {HIGH, LOW, LOW, HIGH};
+  int states2[] = {HIGH, HIGH, LOW, LOW};
+  int states3[] = {LOW, HIGH, HIGH, LOW};
+  int states4[] = {LOW, LOW, HIGH, HIGH};
+            
   digitalWrite(pin_1,HIGH);
   digitalWrite(pin_2,LOW);
   digitalWrite(pin_3,LOW);
@@ -47,27 +52,34 @@ void setup()
   Serial.begin(9600); 						// start the serial port
 }
 
-void loop()
-{
-  
-  
-  float dist_cm = ultrasonic.Ranging(CM); 	// get distance
-  tone(3, 3900, 50);
-  //Serial.println(dist_cm); 					// print the distance 
-  if(dist_cm < 25.0 && dist_cm > 1.0){
-    tone(3, 3900, 200);
-    delay(500);
-    tone(3, 3900, 200);
-    for(int j=0; j<=999; j++) { 
-      unStepMotor( 7, 6, 5, 4, 1); 
-    }
-  }
-  else
-  {
-    for(int j=0; j<=99; j++) { 
-      unStepMotor( 11, 10, 9, 8, 1); 
-      unStepMotor( 7, 6, 5, 4, 1); 
-    }
-  }
-  
+//void loop()
+//{
+//  
+//  
+//  float dist_cm = ultrasonic.Ranging(CM); 	// get distance
+//  tone(3, 3900, 50);
+//  //Serial.println(dist_cm); 					// print the distance 
+//  if(dist_cm < 25.0 && dist_cm > 1.0){
+//    tone(3, 3900, 200);
+//    delay(500);
+//    tone(3, 3900, 200);
+//    for(int j=0; j<=999; j++) { 
+//      unStepMotor( 7, 6, 5, 4, 2); 
+//      unStepMotor( 8, 9, 10, 11, 2); 
+//    }
+//  }
+//  else
+//  {
+//    for(int j=0; j<=99; j++) { 
+//      unStepMotor( 11, 10, 9, 8, 2); 
+//      unStepMotor( 7, 6, 5, 4, 2); 
+//    }
+//  }
+//  
+//}
+
+
+void loop(){    
+  unStepMotor( 11, 10, 9, 8, 2);
+  unStepMotor( 7, 6, 5, 4, 2);
 }
