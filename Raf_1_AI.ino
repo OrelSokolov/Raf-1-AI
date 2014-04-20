@@ -10,76 +10,85 @@
 // Trig - 2, Echo - 3
 Ultrasonic ultrasonic(12, 13);
 
+int states[4][4] = {{HIGH, LOW, LOW, HIGH},
+                  {HIGH, HIGH, LOW, LOW},
+                  {LOW, HIGH, HIGH, LOW},
+                  {LOW, LOW, HIGH, HIGH}};
 
-void unStepMotor(int pin_1, int pin_2,int pin_3,int pin_4,int speedMotor){
-  int states1[] = {HIGH, LOW, LOW, HIGH};
-  int states2[] = {HIGH, HIGH, LOW, LOW};
-  int states3[] = {LOW, HIGH, HIGH, LOW};
-  int states4[] = {LOW, LOW, HIGH, HIGH};
-            
-  digitalWrite(pin_1,HIGH);
-  digitalWrite(pin_2,LOW);
-  digitalWrite(pin_3,LOW);
-  digitalWrite(pin_4,HIGH);
-  delay(speedMotor + 1);
-  //
-  digitalWrite(pin_1,HIGH);
-  digitalWrite(pin_2,HIGH);
-  digitalWrite(pin_3,LOW);
-  digitalWrite(pin_4,LOW);
-  delay(speedMotor + 1);
-  //
-  digitalWrite(pin_1,LOW);
-  digitalWrite(pin_2,HIGH);
-  digitalWrite(pin_3,HIGH);
-  digitalWrite(pin_4,LOW);
-  delay(speedMotor + 1);
-  //
-  digitalWrite(pin_1,LOW);
-  digitalWrite(pin_2,LOW);
-  digitalWrite(pin_3,HIGH);
-  digitalWrite(pin_4,HIGH);
-  delay(speedMotor + 1);
- 
+boolean MOVE_BACKWARD = false;
+boolean MOVE_FORWARD = true;
+
+boolean ROTATE_CLOCKWISE = true;
+boolean ROTATE_ANTICLOCKWISE = false;
+
+
+int motor2_pins[] =   { 11, 10, 9, 8 };
+int motor1_pins[] =   { 7, 6, 5, 4 };
+
+
+// Двигает робота вперед-назад
+void move(int* pins1, int* pins2, int speedMotor = 2, boolean _direction = MOVE_FORWARD){
+
+  for(int i=0; i<4; i++){
+    for(int j=0; j<4; j++){
+      digitalWrite(pins1[j], states[(_direction) ? i : 3-i ][j]);
+      digitalWrite(pins2[j], states[(_direction) ? i : 3-i ][j]);
+    }
+    delay(speedMotor + 1);
+  }
+
+}
+
+// Вращает робота
+void rotate(int* pins1, int* pins2, int speedMotor = 2, boolean _direction = ROTATE_CLOCKWISE){
+
+  for(int i=0; i<4; i++){
+    for(int j=0; j<4; j++){
+      digitalWrite(pins2[j], states[(_direction) ? i : 3-i ][j]);
+      digitalWrite(pins1[j], states[(_direction) ? 3-i : i ][j]);
+    }
+    delay(speedMotor + 1);
+  }
+
 }
 
 
+void rotate_on_angle(int angle = 360, boolean _direction = ROTATE_CLOCKWISE){
+    for(int j=0; j<=int(3.4*angle); j++) {
+      rotate(motor1_pins, motor2_pins, 2, _direction);
+    }
+}
+
+
+void move_in_cm(int dist, boolean _direction = MOVE_FORWARD){
+  for(int j=0; j<=23.6667*dist; j++) {
+      move(motor1_pins, motor2_pins, 2, _direction);
+    }
+}
 
 void setup()
 {
   for (int p=8; p<=11; p++) pinMode(p,OUTPUT);
   for (int p=3; p<=7; p++) pinMode(p,OUTPUT);
-  Serial.begin(9600); 						// start the serial port
+//  Serial.begin(9600); 						// start the serial port
 }
 
-//void loop()
-//{
-//  
-//  
-//  float dist_cm = ultrasonic.Ranging(CM); 	// get distance
-//  tone(3, 3900, 50);
-//  //Serial.println(dist_cm); 					// print the distance 
-//  if(dist_cm < 25.0 && dist_cm > 1.0){
-//    tone(3, 3900, 200);
-//    delay(500);
-//    tone(3, 3900, 200);
-//    for(int j=0; j<=999; j++) { 
-//      unStepMotor( 7, 6, 5, 4, 2); 
-//      unStepMotor( 8, 9, 10, 11, 2); 
-//    }
-//  }
-//  else
-//  {
-//    for(int j=0; j<=99; j++) { 
-//      unStepMotor( 11, 10, 9, 8, 2); 
-//      unStepMotor( 7, 6, 5, 4, 2); 
-//    }
-//  }
-//  
-//}
+void loop()
+{
+  float dist_cm = ultrasonic.Ranging(CM); 	                // get distance
+  tone(3, 3900, 50);
+  //Serial.println(dist_cm); 					// print the distance
+  if(dist_cm < 30.0 && dist_cm > 1.0){
+   tone(3, 3900, 200);
+   rotate_on_angle(10);
+   tone(3, 3900, 200);
 
+   rotate_on_angle(60);
 
-void loop(){    
-  unStepMotor( 11, 10, 9, 8, 2);
-  unStepMotor( 7, 6, 5, 4, 2);
+  }
+  else
+  {
+    move_in_cm(10);
+  }
+
 }
